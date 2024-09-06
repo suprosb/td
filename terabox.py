@@ -56,7 +56,16 @@ async def start_command(client, message):
     join_button = InlineKeyboardButton("ᴊᴏɪɴ ❤️🚀", url="https://t.me/jetmirror")
     developer_button = InlineKeyboardButton("ᴅᴇᴠᴇʟᴏᴘᴇʀ ⚡️", url="https://t.me/hrishikesh2861")
     reply_markup = InlineKeyboardMarkup([[join_button, developer_button]])
-    await message.reply_text(reply_message, reply_markup=reply_markup)
+    video_file_id = "/app/Jet-Mirror.mp4"
+    if os.path.exists(video_file_id):
+        await client.send_video(
+            chat_id=message.chat.id,
+            video=video_file_id,
+            caption=reply_message,
+            reply_markup=reply_markup
+        )
+    else:
+        await message.reply_text(reply_message, reply_markup=reply_markup)
 
 async def is_user_member(client, user_id):
     try:
@@ -72,6 +81,10 @@ async def is_user_member(client, user_id):
 
 @app.on_message(filters.text)
 async def handle_message(client, message: Message):
+    if message.from_user is None:
+        logging.error("Message does not contain user information.")
+        return
+
     user_id = message.from_user.id
     user_mention = message.from_user.mention
     is_member = await is_user_member(client, user_id)
@@ -82,8 +95,15 @@ async def handle_message(client, message: Message):
         await message.reply_text("ʏᴏᴜ ᴍᴜsᴛ ᴊᴏɪɴ ᴍʏ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜsᴇ ᴍᴇ.", reply_markup=reply_markup)
         return
 
+    valid_domains = [
+    'terabox.com', 'nephobox.com', '4funbox.com', 'mirrobox.com', 
+    'momerybox.com', 'teraboxapp.com', '1024tera.com', 
+    'terabox.app', 'gibibox.com', 'goaibox.com', 'terasharelink.com', 'teraboxlink.com'
+    ]
+
     terabox_link = message.text.strip()
-    if "terabox" not in terabox_link:
+
+    if not any(domain in terabox_link for domain in valid_domains):
         await message.reply_text("ᴘʟᴇᴀsᴇ sᴇɴᴅ ᴀ ᴠᴀʟɪᴅ ᴛᴇʀᴀʙᴏx ʟɪɴᴋ.")
         return
 
@@ -94,7 +114,7 @@ async def handle_message(client, message: Message):
         await upload_video(client, file_path, thumbnail_path, video_title, reply_msg, dump_id, user_mention, user_id, message)
     except Exception as e:
         logging.error(f"Error handling message: {e}")
-        await reply_msg.edit_text("ғᴀɪʟᴇᴅ ᴛᴏ ᴘʀᴏᴄᴇss ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ.\nɪғ ʏᴏᴜʀ ғɪʟᴇ sɪᴢᴇ ɪs ᴍᴏʀᴇ ᴛʜᴀɴ 120ᴍʙ ɪᴛ ᴍɪɢʜᴛ ғᴀɪʟ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ.\nᴛʜɪs ɪs ᴛʜᴇ ᴛᴇʀᴀʙᴏx ɪssᴜᴇ, sᴏᴍᴇ ʟɪɴᴋs ᴀʀᴇ ʙʀᴏᴋᴇɴ, sᴏ ᴅᴏɴᴛ ᴄᴏɴᴛᴀᴄᴛ ʙᴏᴛ's ᴏᴡɴᴇʀ")
+        await reply_msg.edit_text("Api has given a Broken Download Link. Dont Contact the Owner for this Issue.")
 
 if __name__ == "__main__":
     keep_alive()
